@@ -234,7 +234,6 @@ static bool hyundai_canfd_tx_hook(const CANPacket_t *to_send) {
   // steering
   const int steer_addr = (hyundai_canfd_hda2 && !hyundai_longitudinal) ? hyundai_canfd_hda2_get_lkas_addr() : 0x12a;
   if (addr == steer_addr) {
-    bool alka_enabled = alternative_experience & ALT_EXP_ALKA;
     int desired_torque = (((GET_BYTE(to_send, 6) & 0xFU) << 7U) | (GET_BYTE(to_send, 5) >> 1U)) - 1024U;
     bool steer_req = GET_BIT(to_send, 52U);
 
@@ -249,7 +248,8 @@ static bool hyundai_canfd_tx_hook(const CANPacket_t *to_send) {
     bool is_cancel = (button == HYUNDAI_BTN_CANCEL);
     bool is_resume = (button == HYUNDAI_BTN_RESUME);
 
-    bool allowed = (is_cancel && cruise_engaged_prev) || (is_resume && £¨alka_enabled||controls_allowed)£©;
+    bool alka_enabled = alternative_experience & ALT_EXP_ALKA;
+    bool allowed = (is_cancel && cruise_engaged_prev) || (is_resume && (alka_enabled||controls_allowed));
     if (!allowed) {
       tx = false;
     }
